@@ -1,4 +1,17 @@
 ﻿import json
+import sys
+import platform
+
+#Stupid check to let me test this code on Windows and not have to go in the raspberry pi before I'm ready to add the
+#servo code
+if platform.system() == "Windows":
+    class MockServoKit:
+        def __init__(self, channels):
+            self.servo = [None] * channels['channels']
+    ServoKit = MockServoKit
+else:
+    from adafruit_servokit import ServoKit
+
 
 filePath = 'sampleWeatherData.json'
 
