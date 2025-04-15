@@ -1,3 +1,4 @@
 ﻿adafruit-circuitpython-busdevice
 adafruit-circuitpython-register
 adafruit-circuitpython-servokit
+pyserial~=3.5

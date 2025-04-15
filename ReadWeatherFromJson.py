@@ -1,40 +1,33 @@
 ﻿import json
-import sys
-import platform
+import serial
 
-#Stupid check to let me test this code on Windows and not have to go in the raspberry pi before I'm ready to add the
-#servo code
-if platform.system() == "Windows":
-    class MockServoKit:
-        def __init__(self, channels):
-            self.servo = [None] * channels['channels']
-    ServoKit = MockServoKit
-else:
-    from adafruit_servokit import ServoKit
-
+arduino = serial.Serial(port='COM6',   baudrate=9600, timeout=.1)
 
 filePath = 'sampleWeatherData.json'
 
 with open(filePath, encoding="utf-8-sig") as json_file:
     data = json.load(json_file)
 
-def printTemp():
-    for key, value in data.items():
-        if key == "Temp":
-            print("Temperature is " + value)
-
-def printHumidity():
-    for key, value in data.items():
-        if key == "Humidity":
-            print("Humidity is " + value)
-
-def printCO2():
-    for key, value in data.items():
-        if key == "CO2(ppm)":
-            print("CO2 level is " + value + "ppm")
+def getTemp():
+    temp = data.get("Temp", "")
+    return temp
+def getHumidity():
+    humid = data.get("Humidity", "")
+    return humid
+def getCO2():
+    co2 = data.get("CO2(ppm)", "")
+    return co2
 
 print(data)
 
-printTemp()
-printHumidity()
-printCO2()
+temp = getTemp()
+humid = getHumidity()
+co2 = getCO2()
+
+print(f"Temperature is {temp}")
+print(f"Humidity is {humid}")
+print(f"CO2 level is {co2}ppm")
+
+#thanks chatgpt
+message = f"{temp} {humid} {co2}\n"
+arduino.write(message.encode('utf-8'))
