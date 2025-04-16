@@ -8,9 +8,7 @@ import requests
 
 # HTTP Request to get weather data. Will be replaced with Jeffery's server instead
 response = requests.get("https://raw.githubusercontent.com/disukomusic/WeatherPredictionDevice/refs/heads/main/sampleWeatherData.json")
-data = response.text
-data = str(bytes(data, "utf-8")[3:])
-data = json.loads(data).decode("utf-8")
+data = response.json()
 
 # local file
 # with open(filePath, encoding="utf-8-sig") as json_file:
