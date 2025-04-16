@@ -28,7 +28,7 @@ void loop() {
 
   int StringCount = 0;
   String str = data;
-
+  // #https://forum.arduino.cc/t/how-to-split-a-string-with-space-and-store-the-items-in-array/888813
   while (str.length() > 0 && StringCount < 3) {
     int index = str.indexOf(' ');
     if (index == -1) {
