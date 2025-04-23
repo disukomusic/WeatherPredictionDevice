@@ -3,6 +3,9 @@
 Servo servo1;
 
 int buttonPin = 10;
+const unsigned long DebounceTime = 10;
+boolean ButtonWasPressed = false;
+unsigned long ButtonStateChangeTime = 0; // Debounce timer
 
 int dataType;
 // 1 - Temp
@@ -23,10 +26,10 @@ float maxCO2 = 2000;
 
 String dataList[3];
 
-// Button state tracking for debouncing
-bool lastButtonState = HIGH;
-unsigned long lastDebounceTime = 0;
-const unsigned long debounceDelay = 50;
+// LED pins
+const int tempLED = 2;
+const int humidLED = 3;
+const int co2LED = 4;
 
 void setup() {
   servo1.attach(9);
@@ -35,27 +38,17 @@ void setup() {
   dataType = 1;
 
   pinMode(buttonPin, INPUT_PULLUP);
+
+  pinMode(tempLED, OUTPUT);
+  pinMode(humidLED, OUTPUT);
+  pinMode(co2LED, OUTPUT);
+  updateLEDs();
 }
 
 void loop() {
   ReadWeatherData();
   RotateServo();
-
-  int buttonVal = digitalRead(buttonPin);
-
-  // Debounce logic
-  if (buttonVal != lastButtonState) {
-    lastDebounceTime = millis();
-  }
-
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    if (lastButtonState == HIGH && buttonVal == LOW) {
-      dataType = (dataType % 3) + 1;
-      Serial.println("Data type changed to: " + String(dataType));
-    }
-  }
-
-  lastButtonState = buttonVal;
+  checkButton();
 }
 
 void ReadWeatherData()
@@ -109,4 +102,38 @@ void RotateServo()
   // Clamp to safe range
   servoAngle = constrain(servoAngle, 0, 180);
   servo1.write(servoAngle);
+}
+
+void checkButton()
+{
+  unsigned long currentTime = millis();
+  boolean buttonIsPressed = digitalRead(buttonPin) == LOW;  // Active LOW
+
+  if (buttonIsPressed != ButtonWasPressed &&
+      currentTime - ButtonStateChangeTime > DebounceTime)
+  {
+    ButtonWasPressed = buttonIsPressed;
+    ButtonStateChangeTime = currentTime;
+
+    if (ButtonWasPressed)
+    {
+      dataType = (dataType % 3) + 1;
+
+      String typeName;
+      switch (dataType) {
+        case 1: typeName = "Temperature: " + String(currentTemp); break;
+        case 2: typeName = "Humidity: " + String(currentHumid); break;
+        case 3: typeName = "CO2: " + String(currentCO2); break;
+      }
+
+      Serial.println("Data type changed to: " + typeName);
+      updateLEDs();
+    }
+  }
+}
+
+void updateLEDs() {
+  digitalWrite(tempLED, dataType == 1 ? HIGH : LOW);
+  digitalWrite(humidLED, dataType == 2 ? HIGH : LOW);
+  digitalWrite(co2LED, dataType == 3 ? HIGH : LOW);
 }
