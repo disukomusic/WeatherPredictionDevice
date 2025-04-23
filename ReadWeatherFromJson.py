@@ -2,13 +2,18 @@
 import json
 import serial
 import requests
+import time
 
 # Open serial comms with the Arduino
-# arduino = serial.Serial(port='COM6',   baudrate=9600, timeout=.1)
+arduino = serial.Serial(port='COM6',   baudrate=9600, timeout=.1)
+#Wait for arduino to reset
+time.sleep(2)
+
 
 # HTTP Request to get weather data. Will be replaced with Jeffery's server instead
 response = requests.get("https://raw.githubusercontent.com/disukomusic/WeatherPredictionDevice/refs/heads/main/sampleWeatherData.json")
-data = response.json()
+# Decode using utf-8-sig to strip BOM, THEN parse
+data = json.loads(response.content.decode("utf-8-sig"))
 
 # local file
 # with open(filePath, encoding="utf-8-sig") as json_file:
@@ -34,6 +39,7 @@ print(f"Temperature is {temp}")
 print(f"Humidity is {humid}")
 print(f"CO2 level is {co2}ppm")
 
-#thanks chatgpt
+print(f"Sending: {temp} {humid} {co2}")
 message = f"{temp} {humid} {co2}\n"
-# arduino.write(message.encode('utf-8'))
+arduino.write(message.encode('utf-8'))
+
