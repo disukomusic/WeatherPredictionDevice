@@ -26,7 +26,7 @@ def getHumidity():
     humid = data.get("Humidity", "")
     return humid
 def getCO2():
-    co2 = data.get("CO2(ppm)", "")
+    co2 = data.get("CO2", "")
     return co2
 
 print(data)
