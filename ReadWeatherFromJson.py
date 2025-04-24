@@ -11,7 +11,7 @@ time.sleep(2)
 
 
 # HTTP Request to get weather data. Will be replaced with Jeffery's server instead
-response = requests.get("https://raw.githubusercontent.com/disukomusic/WeatherPredictionDevice/refs/heads/main/sampleWeatherData.json")
+response = requests.get("http://192.168.0.113/latest")
 # Decode using utf-8-sig to strip BOM, THEN parse
 data = json.loads(response.content.decode("utf-8-sig"))
 
